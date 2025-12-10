@@ -17,11 +17,13 @@
 2. Copy `env.example` to `.env` (or export variables) and set:
    - `DATABASE_URL` (e.g., `postgresql+psycopg://postgres:postgres@localhost:5432/gtfs_chat`)
    - `TRAFIKLAB_API_KEY`
-3. Run PostgreSQL locally and create the database.
+3. Local dev default uses DuckDB (file at `data/gtfs-sweden3/gtfs.duckdb`). Set `DATABASE_URL` accordingly; for Postgres, use your DSN instead.
 4. Ingest GTFS Sweden 3 static feed:
    ```bash
    python -m app.ingestion.gtfs_loader
    ```
+   - This also materializes rail-only tables (`routes_rail`, `trips_rail`, `stop_times_rail`, `stops_rail`, `shapes_rail`, `transfers_rail`) and a helper view with agency names (`routes_rail_with_agency`). Route types are filtered via a rail whitelist (100–109, 200/201/202/204/205, 900).
+   - If you need full multi-modal data, call `ingest(include_rail=False)` from Python and skip the rail subset.
 5. Start the API:
    ```bash
    uvicorn app.main:app --reload

@@ -2,8 +2,13 @@
 __pycache__/
 .pytest_cache/
 .env
+**/.env
 .DS_Store
 *.sqlite
 *.db
 node_modules/
+data/
 
+
+# frontend build outputs
+frontend/.next

@@ -97,6 +97,8 @@ class StopTime(Base):
     drop_off_type = Column(Integer)
     timepoint = Column(Integer)
     shape_dist_traveled = Column(Float)
+    pickup_booking_rule_id = Column(String)
+    drop_off_booking_rule_id = Column(String)
 
     __table_args__ = (
         Index("idx_stoptimes_stop_seq", "stop_id", "stop_sequence"),
@@ -142,7 +144,7 @@ class StopArea(Base):
     __tablename__ = "stop_areas"
 
     area_id = Column(String, primary_key=True)
-    stop_id = Column(String, index=True)
+    stop_id = Column(String, primary_key=True, index=True)
 
 
 class Area(Base):
@@ -151,4 +153,5 @@ class Area(Base):
     area_id = Column(String, primary_key=True)
     area_name = Column(String, nullable=False)
     area_type = Column(String)
+    samtrafiken_area_type = Column(String)
 

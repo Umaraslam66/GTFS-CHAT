@@ -5,17 +5,23 @@ from sqlalchemy import text
 from sqlalchemy.orm import Session
 
 from . import schemas
-from .models import Stop
 
 
-def search_stops(session: Session, name: str, limit: int = 10) -> List[Stop]:
-    query = (
-        session.query(Stop)
-        .filter(Stop.stop_name.ilike(f"%{name}%"))
-        .order_by(Stop.stop_name)
-        .limit(limit)
+def search_stops(session: Session, name: str, limit: int = 10) -> List[dict]:
+    """
+    Rail-focused stop search against stops_rail (rail-only subset).
+    """
+    sql = text(
+        """
+        SELECT stop_id, stop_name
+        FROM stops_rail
+        WHERE stop_name ILIKE :pattern
+        ORDER BY stop_name
+        LIMIT :limit
+        """
     )
-    return list(query.all())
+    rows = session.execute(sql, {"pattern": f"%{name}%", "limit": limit}).mappings().all()
+    return [dict(row) for row in rows]
 
 
 def active_services(session: Session, target_date: date) -> List[str]:
@@ -65,8 +71,8 @@ def departures_between(
     if not origin_candidates or not dest_candidates:
         return []
 
-    origin_ids = [s.stop_id for s in origin_candidates]
-    dest_ids = [s.stop_id for s in dest_candidates]
+    origin_ids = [s["stop_id"] for s in origin_candidates]
+    dest_ids = [s["stop_id"] for s in dest_candidates]
 
     services = active_services(session, travel_date) if travel_date else None
     if travel_date and not services:
@@ -94,15 +100,18 @@ def departures_between(
             st_dest.arrival_time AS arrival,
             s_origin.stop_name AS origin_name,
             s_dest.stop_name AS destination_name,
+            r.agency_name,
+            r.route_short_name,
             t.trip_id,
             t.route_id
-        FROM stop_times st_origin
-        JOIN stop_times st_dest
+        FROM stop_times_rail st_origin
+        JOIN stop_times_rail st_dest
             ON st_origin.trip_id = st_dest.trip_id
            AND st_origin.stop_sequence < st_dest.stop_sequence
-        JOIN trips t ON t.trip_id = st_origin.trip_id
-        JOIN stops s_origin ON s_origin.stop_id = st_origin.stop_id
-        JOIN stops s_dest ON s_dest.stop_id = st_dest.stop_id
+        JOIN trips_rail t ON t.trip_id = st_origin.trip_id
+        JOIN routes_rail_with_agency r ON r.route_id = t.route_id
+        JOIN stops_rail s_origin ON s_origin.stop_id = st_origin.stop_id
+        JOIN stops_rail s_dest ON s_dest.stop_id = st_dest.stop_id
         WHERE st_origin.stop_id IN :origin_ids
           AND st_dest.stop_id IN :dest_ids
           {time_clause}
@@ -121,6 +130,8 @@ def departures_between(
         schemas.TableColumn(id="arrival", label="Arrival"),
         schemas.TableColumn(id="origin_name", label="Origin"),
         schemas.TableColumn(id="destination_name", label="Destination"),
+        schemas.TableColumn(id="agency_name", label="Agency"),
+        schemas.TableColumn(id="route_short_name", label="Route"),
         schemas.TableColumn(id="route_id", label="Route"),
         schemas.TableColumn(id="trip_id", label="Trip"),
     ]
