@@ -6,6 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from .config import get_settings
 from .router_chat import router as chat_router
 from .router_health import router as health_router
+from .router_models import router as models_router
 
 settings = get_settings()
 
@@ -23,6 +24,8 @@ app.add_middleware(
         "http://127.0.0.1:3000",
         "http://localhost:3001",
         "http://127.0.0.1:3001",
+        "http://localhost:8080",
+        "http://127.0.0.1:8080",
     ],
     allow_credentials=True,
     allow_methods=["*"],
@@ -31,6 +34,7 @@ app.add_middleware(
 
 app.include_router(health_router)
 app.include_router(chat_router)
+app.include_router(models_router)
 
 
 @app.get("/")

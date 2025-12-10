@@ -18,5 +18,6 @@ async def chat_adk_endpoint(payload: schemas.ChatRequest, db: Session = Depends(
         message=payload.message,
         session=db,
         session_id=payload.session_id,
+        model=payload.model,
     )
 

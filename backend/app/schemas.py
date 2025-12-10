@@ -5,6 +5,7 @@ from pydantic import BaseModel, Field
 class ChatRequest(BaseModel):
     message: str = Field(..., description="User input")
     session_id: Optional[str] = Field(None, description="Client session identifier for context")
+    model: Optional[str] = Field(None, description="Optional model override (e.g., 'mistralai/devstral-2512:free')")
 
 
 class TableColumn(BaseModel):

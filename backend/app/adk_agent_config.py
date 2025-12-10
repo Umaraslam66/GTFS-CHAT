@@ -8,6 +8,8 @@ import logging
 from google.adk import Agent
 from google.adk.models.lite_llm import LiteLlm
 
+from typing import Optional
+
 from .config import get_settings
 from .adk_tools import get_departures, search_rail_stops, get_next_departures, get_route_stops
 
@@ -30,17 +32,28 @@ if not model_name.startswith("openrouter/"):
         # Fallback: assume it's a model name that needs provider
         model_name = f"openrouter/{model_name}"
 
-litellm_model = LiteLlm(model=model_name)
-
-# Create ADK agent with tools
-gtfs_agent = Agent(
-    model=litellm_model,
-    name="gtfs_sweden_assistant",
-    description=(
-        "A helpful assistant for Swedish railway schedules and routes. "
-        "Can search for railway stations and find train departures between locations."
-    ),
-    instruction="""
+def create_agent_with_model(model_override: Optional[str] = None) -> Agent:
+    """Create an ADK agent with the specified model or default."""
+    # Use override model or default from settings
+    selected_model = model_override or model_name
+    
+    # Ensure proper format for LiteLLM
+    if not selected_model.startswith("openrouter/"):
+        if "/" in selected_model:
+            selected_model = f"openrouter/{selected_model}"
+        else:
+            selected_model = f"openrouter/{selected_model}"
+    
+    litellm_model = LiteLlm(model=selected_model)
+    
+    return Agent(
+        model=litellm_model,
+        name="gtfs_sweden_assistant",
+        description=(
+            "A helpful assistant for Swedish railway schedules and routes. "
+            "Can search for railway stations and find train departures between locations."
+        ),
+        instruction="""
 You are a helpful assistant for Swedish railway travel information.
 You help users find train schedules, stations, and routes using the GTFS Sweden dataset.
 
@@ -59,7 +72,12 @@ When users ask about trains or routes:
 
 Always be helpful and provide accurate information based on the tool results.
 If you cannot find information, suggest alternative queries or time windows.
-    """,
-    tools=[search_rail_stops, get_departures, get_next_departures, get_route_stops],
-)
+        """,
+        tools=[search_rail_stops, get_departures, get_next_departures, get_route_stops],
+    )
+
+
+# Default agent with default model
+litellm_model = LiteLlm(model=model_name)
+gtfs_agent = create_agent_with_model()
 

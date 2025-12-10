@@ -4,10 +4,14 @@ import ChatContainer from "@/components/chat/ChatContainer";
 import MessageInput from "@/components/chat/MessageInput";
 import { Message } from "@/components/chat/MessageBubble";
 import { sendChat } from "@/lib/api";
+import { AVAILABLE_MODELS } from "@/components/chat/ModelSelector";
 
 const Index = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [selectedModel, setSelectedModel] = useState<string>(
+    AVAILABLE_MODELS[0].value
+  );
   const [sessionId] = useState<string>(() =>
     typeof crypto !== "undefined" && "randomUUID" in crypto
       ? crypto.randomUUID()
@@ -40,7 +44,7 @@ const Index = () => {
     ]);
 
     try {
-      const responseMessages = await sendChat(content, sessionId);
+      const responseMessages = await sendChat(content, sessionId, selectedModel);
 
       // Replace loading with actual response
       setMessages((prev) => {
@@ -68,10 +72,13 @@ const Index = () => {
     } finally {
       setIsLoading(false);
     }
-  }, [sessionId]);
+  }, [sessionId, selectedModel]);
 
   return (
-    <MainLayout>
+    <MainLayout
+      selectedModel={selectedModel}
+      onModelChange={setSelectedModel}
+    >
       <ChatContainer messages={messages} onSuggestion={handleSendMessage} />
       <MessageInput onSend={handleSendMessage} disabled={isLoading} />
     </MainLayout>

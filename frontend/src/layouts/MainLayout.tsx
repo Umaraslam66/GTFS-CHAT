@@ -3,12 +3,18 @@ import TopBar from "@/components/chat/TopBar";
 
 interface MainLayoutProps {
   children: ReactNode;
+  selectedModel: string;
+  onModelChange: (model: string) => void;
 }
 
-const MainLayout = ({ children }: MainLayoutProps) => {
+const MainLayout = ({
+  children,
+  selectedModel,
+  onModelChange,
+}: MainLayoutProps) => {
   return (
     <div className="flex flex-col h-screen bg-background">
-      <TopBar />
+      <TopBar selectedModel={selectedModel} onModelChange={onModelChange} />
       <main className="flex-1 flex flex-col overflow-hidden">{children}</main>
     </div>
   );

@@ -27,11 +27,15 @@ function withWarnings(text: string, warnings?: string[]): string {
   return text ? `${text}\n\nWarnings:\n${warningText}` : `Warnings:\n${warningText}`;
 }
 
-export async function sendChat(message: string, sessionId?: string): Promise<Message[]> {
+export async function sendChat(
+  message: string,
+  sessionId?: string,
+  model?: string
+): Promise<Message[]> {
   const resp = await fetch(`${API_BASE}/api/chat/adk`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ message, session_id: sessionId }),
+    body: JSON.stringify({ message, session_id: sessionId, model }),
   });
 
   if (!resp.ok) {
