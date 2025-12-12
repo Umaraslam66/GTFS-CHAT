@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+
+{% block title %}Home - GTFS Chat{% endblock %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto px-4 py-12">
+    <!-- Hero Section -->
+    <div class="text-center mb-12">
+        <h1 class="text-5xl font-bold gradient-text mb-4">
+            Swedish Public Transit Data Chat
+        </h1>
+        <p class="text-xl text-gray-600 mb-8">
+            Ask questions about Swedish public transit in natural language
+        </p>
+        <a href="/chat/" class="inline-block bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-8 py-4 rounded-lg text-lg font-semibold hover:from-purple-700 hover:to-indigo-700 transform hover:scale-105 transition-all">
+            Start Chatting →
+        </a>
+    </div>
+
+    <!-- Features Grid -->
+    <div class="grid md:grid-cols-3 gap-8 mb-12">
+        <div class="bg-white p-6 rounded-xl shadow-lg">
+            <div class="text-4xl mb-4">🗣️</div>
+            <h3 class="text-xl font-bold mb-2">Natural Language</h3>
+            <p class="text-gray-600">Ask questions in plain English or Swedish - no SQL knowledge required</p>
+        </div>
+        
+        <div class="bg-white p-6 rounded-xl shadow-lg">
+            <div class="text-4xl mb-4">📊</div>
+            <h3 class="text-xl font-bold mb-2">Rich Visualizations</h3>
+            <p class="text-gray-600">Get interactive tables, charts, and insights from your queries</p>
+        </div>
+        
+        <div class="bg-white p-6 rounded-xl shadow-lg">
+            <div class="text-4xl mb-4">🚄</div>
+            <h3 class="text-xl font-bold mb-2">Complete Data</h3>
+            <p class="text-gray-600">32M+ records covering all Swedish public transit (2024-2025)</p>
+        </div>
+    </div>
+
+    <!-- Example Queries -->
+    <div class="bg-white rounded-xl shadow-lg p-8 mb-12">
+        <h2 class="text-2xl font-bold mb-6">Example Questions You Can Ask</h2>
+        
+        <div class="space-y-4">
+            <div class="border-l-4 border-purple-600 pl-4">
+                <p class="font-semibold text-gray-800">"Show me all transit operators in the database"</p>
+                <p class="text-sm text-gray-600">Get a list of all 79 transit agencies</p>
+            </div>
+            
+            <div class="border-l-4 border-indigo-600 pl-4">
+                <p class="font-semibold text-gray-800">"How many routes does SJ operate?"</p>
+                <p class="text-sm text-gray-600">Query specific operators</p>
+            </div>
+            
+            <div class="border-l-4 border-purple-600 pl-4">
+                <p class="font-semibold text-gray-800">"Find all stops in Stockholm"</p>
+                <p class="text-sm text-gray-600">Search by location</p>
+            </div>
+            
+            <div class="border-l-4 border-indigo-600 pl-4">
+                <p class="font-semibold text-gray-800">"What are the high-speed rail routes?"</p>
+                <p class="text-sm text-gray-600">Filter by route type</p>
+            </div>
+            
+            <div class="border-l-4 border-purple-600 pl-4">
+                <p class="font-semibold text-gray-800">"Show a chart of routes by operator"</p>
+                <p class="text-sm text-gray-600">Generate visualizations</p>
+            </div>
+            
+            <div class="border-l-4 border-indigo-600 pl-4">
+                <p class="font-semibold text-gray-800">"Get departures from Stockholm Central on Monday"</p>
+                <p class="text-sm text-gray-600">Complex schedule queries</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dataset Info -->
+    <div class="bg-gradient-to-r from-purple-50 to-indigo-50 rounded-xl p-8">
+        <h2 class="text-2xl font-bold mb-4">About the Dataset</h2>
+        <div class="grid md:grid-cols-2 gap-6">
+            <div>
+                <h3 class="font-semibold text-lg mb-2">Coverage</h3>
+                <ul class="space-y-2 text-gray-700">
+                    <li>✓ <strong>32,192,273</strong> total records</li>
+                    <li>✓ <strong>79</strong> transit agencies</li>
+                    <li>✓ <strong>16,531</strong> routes</li>
+                    <li>✓ <strong>51,658</strong> stops</li>
+                    <li>✓ <strong>1.6M</strong> trips</li>
+                </ul>
+            </div>
+            <div>
+                <h3 class="font-semibold text-lg mb-2">Details</h3>
+                <ul class="space-y-2 text-gray-700">
+                    <li>📅 Time Period: January 2024 - December 2025</li>
+                    <li>🗄️ Database: DuckDB (300 MB)</li>
+                    <li>🔧 Format: GTFS Standard</li>
+                    <li>🇸🇪 Region: Complete Swedish coverage</li>
+                    <li>🚂 Special Focus: Long-distance rail operators</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

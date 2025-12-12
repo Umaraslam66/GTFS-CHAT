@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+
+{% block title %}Chat - GTFS Chat{% endblock %}
+
+{% block extra_head %}
+<!-- Load the Vanna web component -->
+<script type="module" src="https://img.vanna.ai/vanna-components.js"></script>
+
+<style>
+    vanna-chat {
+        width: 100%;
+        height: 100%;
+        display: block;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 py-8">
+    <div class="mb-6">
+        <h1 class="text-3xl font-bold gradient-text mb-2">Chat with Swedish Transit Data</h1>
+        <p class="text-gray-600">Ask questions in natural language and get instant answers with visualizations</p>
+    </div>
+
+    <!-- Connection Status -->
+    <div id="connection-status" class="mb-4 p-4 bg-blue-50 border border-blue-200 rounded-lg hidden">
+        <div class="flex items-center">
+            <div class="animate-pulse mr-3">
+                <div class="h-3 w-3 bg-blue-600 rounded-full"></div>
+            </div>
+            <span class="text-blue-800 font-medium">Connecting to Vanna server...</span>
+        </div>
+    </div>
+
+    <div id="connection-error" class="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg hidden">
+        <div class="flex items-center">
+            <svg class="h-5 w-5 text-red-600 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+            </svg>
+            <div>
+                <span class="text-red-800 font-medium block">Cannot connect to Vanna server</span>
+                <span class="text-red-600 text-sm">Make sure the Vanna server is running at {{ vanna_server_url }}</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Vanna Chat Component Container -->
+    <div class="bg-white rounded-xl shadow-2xl overflow-hidden" style="height: calc(100vh - 280px); min-height: 600px;">
+        <vanna-chat
+            id="vanna-chat"
+            api-base="{{ vanna_server_url }}"
+            sse-endpoint="{{ sse_endpoint }}"
+            ws-endpoint="{{ ws_endpoint }}"
+            poll-endpoint="{{ poll_endpoint }}">
+        </vanna-chat>
+    </div>
+
+    <!-- Quick Tips -->
+    <div class="mt-6 bg-gradient-to-r from-purple-50 to-indigo-50 rounded-lg p-4">
+        <h3 class="font-semibold text-gray-800 mb-2">💡 Quick Tips:</h3>
+        <ul class="text-sm text-gray-700 space-y-1">
+            <li>• Start with simple queries like "Show me all operators" or "List routes in Stockholm"</li>
+            <li>• Ask for specific operators: "How many routes does SJ have?"</li>
+            <li>• Request visualizations: "Show a chart of routes by type"</li>
+            <li>• The AI understands both English and Swedish terminology</li>
+        </ul>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    // Check Vanna server connection on page load
+    window.addEventListener('DOMContentLoaded', async () => {
+        const statusDiv = document.getElementById('connection-status');
+        const errorDiv = document.getElementById('connection-error');
+        const vannaChat = document.getElementById('vanna-chat');
+        
+        statusDiv.classList.remove('hidden');
+        
+        try {
+            const response = await fetch('{{ vanna_server_url }}/health', {
+                method: 'GET',
+                timeout: 5000
+            });
+            
+            if (response.ok) {
+                statusDiv.classList.add('hidden');
+                console.log('✓ Connected to Vanna server');
+            } else {
+                throw new Error('Server responded with error');
+            }
+        } catch (error) {
+            statusDiv.classList.add('hidden');
+            errorDiv.classList.remove('hidden');
+            console.error('✗ Cannot connect to Vanna server:', error);
+        }
+        
+        // Listen for artifact events
+        vannaChat.addEventListener('artifact-opened', (event) => {
+            console.log('Artifact opened:', event.detail);
+            // You can customize artifact handling here
+        });
+    });
+</script>
+{% endblock %}
